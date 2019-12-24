@@ -13,7 +13,7 @@ int main()
 {
 	auto mesh = Mesh(6);
 	for( int i = 0 ; i < 5 ; ++ i )
-		mesh.add_station(make_shared<Station>(3));
+		mesh.add_station(make_shared<Station>(3, 6, 10));
 
 	mesh.add_neighbour(1, 2);
 	mesh.add_neighbour(1, 3);
@@ -38,6 +38,9 @@ int main()
 	mesh.add_neighbour(5, 4);
 
 	mesh.init_channel();
+	auto y = mesh.stations[2]->best_response();
+	y = mesh.stations[2]->best_response();
+
     std::cout << "Hello World!\n"; 
 }
 
