@@ -14,23 +14,42 @@ void Station::add_neighbour(const shared_ptr<Station>& neighbour)
 	interface_size = (r_max < neighbours.size()) ? r_max : neighbours.size();
 }
 
-void Station::init_channel()
+void Station::init_strategy()
 {
 	for (int i = 0; i < interface_size; ++i) {
 		strategy.at(i) = true;
 	}
 }
 
-void Station::assign_channel(const vector<bool> new_strategy)
+void Station::assign_strategy(const vector<bool> &new_strategy)
 {
 	strategy = new_strategy;
+}
+
+void Station::assign_channel(const vector<int>& new_channel)
+{
+	fill(strategy.begin(), strategy.end(), false);
+	for (const int ch : new_channel) {
+		if (ch - 1 < c_max) {
+			strategy[ch - 1] = true;
+		}
+	}
+}
+
+vector<int> Station::get_channel()
+{
+	vector<int> channel;
+	for (int i = 0; i < c_max; ++i) {
+		if (strategy[i]) channel.push_back(i + 1);
+	}
+	return channel;
 }
 
 bool Station::best_response()
 {
 	auto org_strategy = strategy;
 	vector<bool> max_strategy = org_strategy;
-	int max_utility = numeric_limits<int>().min();
+	int max_utility = utility();
 
 	vector<bool> walk(c_max, false);
 	fill(walk.begin(), walk.begin()+interface_size, true);
@@ -47,7 +66,7 @@ bool Station::best_response()
 	return !(max_strategy == org_strategy);
 }
 
-int Station::utility()
+int Station::utility() const
 {
 	int u = t();
 	for (const auto &ptr : neighbours) {
@@ -56,12 +75,12 @@ int Station::utility()
 	return u;
 }
 
-int Station::t()
+int Station::t() const
 {
 	return beta * gain() + impact();
 }
 
-int Station::impact()
+int Station::impact() const
 {
 	int i = 0;
 	for (const auto &ptr : neighbours) {
@@ -70,7 +89,7 @@ int Station::impact()
 	return i;
 }
 
-int Station::gain()
+int Station::gain() const
 {
 	int g = 0;
 	for (const auto &nb : neighbours) {
@@ -80,16 +99,16 @@ int Station::gain()
 }
 
 
-int Station::C(const shared_ptr<Station>& neighbour)
+int Station::C(const shared_ptr<Station>& neighbour) const
 {
 	return (common(neighbour) == 0) ? -static_cast<int>(neighbours.size()) : 0;
 }
 
-int Station::common(const shared_ptr<Station>& neighbour)
+int Station::common(const shared_ptr<Station>& neighbour) const
 {
 	int num = 0;
 	for (int i = 0; i < c_max; ++i) {
-		if (strategy.at(i) == neighbour->strategy.at(i))
+		if (strategy.at(i) && neighbour->strategy.at(i))
 			++num;
 	}
 	return num;

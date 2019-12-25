@@ -9,11 +9,10 @@
 
 using namespace std;
 
-int main()
-{
+void my() {
 	auto mesh = Mesh(6);
-	for( int i = 0 ; i < 5 ; ++ i )
-		mesh.add_station(make_shared<Station>(3, 6, 10));
+	for (int i = 0; i < 5; ++i)
+		mesh.create_station(3, 7, 5);
 
 	mesh.add_neighbour(1, 2);
 	mesh.add_neighbour(1, 3);
@@ -38,10 +37,55 @@ int main()
 	mesh.add_neighbour(5, 4);
 
 	mesh.init_channel();
-	auto y = mesh.stations[2]->best_response();
-	y = mesh.stations[2]->best_response();
+	mesh.find_nash();
+	mesh.print_status();
+	std::cout << "phi: " << mesh.potential() << endl;
 
-    std::cout << "Hello World!\n"; 
+}
+
+int main()
+{
+	my();
+	auto mesh = Mesh(6);
+	for( int i = 0 ; i < 5 ; ++ i )
+		mesh.add_station(make_shared<Station>(3, 7, 5));
+
+	mesh.add_neighbour(1, 2);
+	mesh.add_neighbour(1, 3);
+	mesh.add_neighbour(1, 2);
+	mesh.add_neighbour(1, 4);
+
+	mesh.add_neighbour(2, 1);
+	mesh.add_neighbour(2, 3);
+	mesh.add_neighbour(2, 5);
+
+	mesh.add_neighbour(3, 1);
+	mesh.add_neighbour(3, 4);
+	mesh.add_neighbour(3, 2);
+	mesh.add_neighbour(3, 5);
+
+	mesh.add_neighbour(4, 1);
+	mesh.add_neighbour(4, 3);
+	mesh.add_neighbour(4, 5);
+
+	mesh.add_neighbour(5, 2);
+	mesh.add_neighbour(5, 3);
+	mesh.add_neighbour(5, 4);
+
+	mesh.stations[0]->assign_channel({ 2, 5, 7 });
+	mesh.stations[1]->assign_channel({ 1, 2, 3 });
+	mesh.stations[2]->assign_channel({ 1, 4, 5 });
+	mesh.stations[3]->assign_channel({ 2, 4, 6 });
+	mesh.stations[4]->assign_channel({ 3, 5, 6 });
+
+	//mesh.find_nash();
+	mesh.print_status();
+	std::cout << "phi: " << mesh.potential() << endl;
+	cout << "=== find nash ===" << endl;
+
+	mesh.find_nash();
+	mesh.print_status();
+    std::cout << "phi: " << mesh.potential() << endl; 
 }
 
 // 執行程式: Ctrl + F5 或 [偵錯] > [啟動但不偵錯] 功能表
