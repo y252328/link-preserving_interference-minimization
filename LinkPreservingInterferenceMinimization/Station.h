@@ -8,7 +8,7 @@ using namespace std;
 class Station
 {
 public:
-	Station(const int radio_max, const int channel_max, const int b, const int x=0, const int y=0)
+	Station(const int radio_max, const int channel_max, const int b, const double x=0, const double y=0)
 		:loc_x(x), loc_y(y), r_max(radio_max), c_max(channel_max), beta(b), strategy(channel_max, false) {};
 	void add_neighbour(const shared_ptr<Station> &neighbour);
 	void init_strategy();
@@ -24,7 +24,8 @@ public:
 	int gain() const;
 	int C(const shared_ptr<Station>& neighbour) const;
 	int common(const shared_ptr<Station>& neighbour) const;
-	int loc_x, loc_y;
+	int sn;
+	double loc_x, loc_y;
 	~Station();
 private:
 	const int r_max, c_max, beta;
