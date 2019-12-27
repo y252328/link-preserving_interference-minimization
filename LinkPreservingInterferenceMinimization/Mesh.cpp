@@ -8,12 +8,14 @@ using namespace std;
 int Mesh::add_station(shared_ptr<Station> station)
 {
 	stations.emplace_back(station);
+	station->sn = stations.size() - 1;
 	return stations.size() - 1;
 }
 
 int Mesh::create_station(const int r_max, const int c_max, const int beta, const double x, const double y)
 {
-	stations.push_back(make_shared<Station>(r_max, c_max, beta, x, y));
+	int sn = stations.size();
+	stations.push_back(make_shared<Station>(r_max, c_max, beta, sn, x, y));
 	return stations.size() - 1;
 }
 

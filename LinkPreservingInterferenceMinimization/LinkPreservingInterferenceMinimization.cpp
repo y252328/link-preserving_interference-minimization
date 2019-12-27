@@ -48,7 +48,7 @@ void my() {
 void paper() {
 	auto mesh = Mesh();
 	for (int i = 0; i < 5; ++i)
-		mesh.add_station(make_shared<Station>(3, 7, 5));
+		mesh.create_station(3, 7, 5);
 
 	mesh.add_neighbour(1, 2);
 	mesh.add_neighbour(1, 3);
@@ -93,7 +93,7 @@ int main()
 	constexpr int r_max = 3;
 	constexpr int c_max = 9;
 	constexpr int beta = 25;
-	constexpr int node = 50;
+	constexpr int node = 15;
 	constexpr double range = 200;
 	constexpr double x_rang = 1000;
 	constexpr double y_rang = 1000;

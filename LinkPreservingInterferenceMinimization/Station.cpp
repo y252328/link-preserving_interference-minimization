@@ -19,13 +19,13 @@ void Station::init_strategy()
 	for (int i = 0; i < interface_size; ++i) {
 		strategy.at(i) = true;
 	}
-	common_cache.clear();
+	t_strategy = chrono::steady_clock::now();
 }
 
 void Station::assign_strategy(const vector<bool> &new_strategy)
 {
 	strategy = new_strategy;
-	common_cache.clear();
+	t_strategy = chrono::steady_clock::now();
 }
 
 void Station::assign_channel(const vector<int>& new_channel)
@@ -36,7 +36,7 @@ void Station::assign_channel(const vector<int>& new_channel)
 			strategy[ch - 1] = true;
 		}
 	}
-	common_cache.clear();
+	t_strategy = chrono::steady_clock::now();
 }
 
 vector<int> Station::get_channel()
@@ -59,6 +59,7 @@ bool Station::best_response()
 
 	do {
 		strategy = walk;
+		t_strategy = chrono::steady_clock::now();
 		auto new_utility = utility();
 		if (new_utility > max_utility) {
 			max_strategy = walk;
@@ -66,6 +67,7 @@ bool Station::best_response()
 		}
 	} while (prev_permutation(walk.begin(), walk.end()));
 	strategy = max_strategy;
+	t_strategy = chrono::steady_clock::now();
 	return !(max_strategy == org_strategy);
 }
 
@@ -87,16 +89,7 @@ int Station::impact()
 {
 	int i = 0;
 	for (const auto &ptr : neighbours) {
-#ifdef CACHE
-		if (common_cache.count(ptr.lock().get()))
-			i -= common_cache.at(ptr.lock().get());
-		else
-			i -= common(ptr.lock());
-#else
 		i -= common(ptr.lock());
-#endif // CACHE
-
-
 	}
 	return i;
 }
@@ -118,15 +111,26 @@ int Station::C(const shared_ptr<Station>& neighbour)
 
 int Station::common(const shared_ptr<Station>& neighbour)
 {
+	auto ptr = neighbour.get();
+	const auto & pair = common_cache[neighbour->sn];
+	if (pair.first > t_strategy && pair.first > neighbour->t_strategy) {
+		return pair.second;
+	}
+
 	int num = 0;
 	for (int i = 0; i < c_max; ++i) {
 		if (strategy[i] && neighbour->strategy[i])
 			++num;
 	}
-#ifdef CACHE
-	common_cache[neighbour.get()] = num;
-#endif
+	common_cache[neighbour->sn] = make_pair(chrono::steady_clock::now(), num);
 	return num;
+	//int num = 0;
+	//for (int i = 0; i < c_max; ++i) {
+	//	if (strategy[i] && neighbour->strategy[i])
+	//		++num;
+	//}
+	//return num;
+
 }
 
 Station::~Station()
