@@ -10,9 +10,9 @@ using namespace std;
 class Mesh
 {
 public:
-	Mesh(const int max_ch) : max_channel(max_ch) {};
+	Mesh() {};
 	int add_station(shared_ptr<Station> station);
-	int create_station(const int r_max, const int c_max, const int beta);
+	int create_station(const int r_max, const int c_max, const int beta, const double x=0, const double y=0);
 	void add_neighbour(const int idx_a, const int idx_b);
 	void init_channel();
 
@@ -20,11 +20,9 @@ public:
 	double distance(const int idx_a, const int idx_b) const;
 	void find_nash();
 	void print_status() const;
-	void auto_connect(const int range);
+	void auto_connect(const double range);
 	vector<shared_ptr<Station>> stations;
 	~Mesh();
 private:
-	const int max_channel;
-
 };
 

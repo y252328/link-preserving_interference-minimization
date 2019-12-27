@@ -11,9 +11,9 @@ int Mesh::add_station(shared_ptr<Station> station)
 	return stations.size() - 1;
 }
 
-int Mesh::create_station(const int r_max, const int c_max, const int beta)
+int Mesh::create_station(const int r_max, const int c_max, const int beta, const double x, const double y)
 {
-	stations.emplace_back(make_shared<Station>(r_max, c_max, beta));
+	stations.push_back(make_shared<Station>(r_max, c_max, beta, x, y));
 	return stations.size() - 1;
 }
 
@@ -49,7 +49,7 @@ double Mesh::distance(const int idx_a, const int idx_b) const
 void Mesh::find_nash()
 {
 	auto move = false;
-	print_status();
+	//print_status();
 	do {
 		move = false;
 		for (auto &ptr : stations) {
@@ -58,7 +58,7 @@ void Mesh::find_nash()
 				break;
 			}
 		}
-		print_status();
+		//print_status();
 	} while (move);
 }
 
@@ -74,7 +74,7 @@ void Mesh::print_status() const
 	cout << endl;
 }
 
-void Mesh::auto_connect(const int range)
+void Mesh::auto_connect(const double range)
 {
 	for (int i = 0; i < stations.size(); ++i) {
 		for (int j = 0; j < stations.size(); ++j) {

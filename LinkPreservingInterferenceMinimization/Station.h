@@ -9,7 +9,8 @@ class Station
 {
 public:
 	Station(const int radio_max, const int channel_max, const int b, const double x=0, const double y=0)
-		:loc_x(x), loc_y(y), r_max(radio_max), c_max(channel_max), beta(b), strategy(channel_max, false) {};
+		:sn(0), interface_size(0),
+		loc_x(x), loc_y(y), r_max(radio_max), c_max(channel_max), beta(b), strategy(channel_max, false) {};
 	void add_neighbour(const shared_ptr<Station> &neighbour);
 	void init_strategy();
 	void assign_strategy(const vector<bool> &new_strategy);

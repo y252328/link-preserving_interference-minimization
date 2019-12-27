@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <memory>
+#include <random>
 
 #include "Mesh.h"
 #include "Station.h"
@@ -10,7 +11,7 @@
 using namespace std;
 
 void my() {
-	auto mesh = Mesh(6);
+	auto mesh = Mesh();
 	for (int i = 0; i < 5; ++i)
 		mesh.create_station(3, 7, 5);
 
@@ -43,11 +44,9 @@ void my() {
 
 }
 
-int main()
-{
-	my();
-	auto mesh = Mesh(6);
-	for( int i = 0 ; i < 5 ; ++ i )
+void paper() {
+	auto mesh = Mesh();
+	for (int i = 0; i < 5; ++i)
 		mesh.add_station(make_shared<Station>(3, 7, 5));
 
 	mesh.add_neighbour(1, 2);
@@ -85,7 +84,31 @@ int main()
 
 	mesh.find_nash();
 	mesh.print_status();
-    std::cout << "phi: " << mesh.potential() << endl; 
+	std::cout << "phi: " << mesh.potential() << endl;
+}
+
+int main()
+{
+	constexpr int r_max = 3;
+	constexpr int c_max = 9;
+	constexpr int beta = 25;
+	constexpr int node = 50;
+	constexpr double range = 200;
+	constexpr double x_rang = 1000;
+	constexpr double y_rang = 1000;
+	std::random_device rd;
+	std::default_random_engine generator(rd());
+	std::uniform_real_distribution<double> x_unif(0.0, x_rang);
+	std::uniform_real_distribution<double> y_unif(0.0, y_rang);
+	auto mesh = Mesh();
+	for (int i = 0; i < node; ++i) {
+		mesh.create_station(r_max, c_max, beta, x_unif(generator), y_unif(generator));
+	}
+	mesh.auto_connect(range);
+	mesh.init_channel();
+	mesh.find_nash();
+	auto phi = mesh.potential();
+	return 0;
 }
 
 // 執行程式: Ctrl + F5 或 [偵錯] > [啟動但不偵錯] 功能表
