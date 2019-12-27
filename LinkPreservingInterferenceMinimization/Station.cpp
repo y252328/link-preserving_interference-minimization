@@ -19,11 +19,13 @@ void Station::init_strategy()
 	for (int i = 0; i < interface_size; ++i) {
 		strategy.at(i) = true;
 	}
+	common_cache.clear();
 }
 
 void Station::assign_strategy(const vector<bool> &new_strategy)
 {
 	strategy = new_strategy;
+	common_cache.clear();
 }
 
 void Station::assign_channel(const vector<int>& new_channel)
@@ -34,6 +36,7 @@ void Station::assign_channel(const vector<int>& new_channel)
 			strategy[ch - 1] = true;
 		}
 	}
+	common_cache.clear();
 }
 
 vector<int> Station::get_channel()
@@ -66,7 +69,7 @@ bool Station::best_response()
 	return !(max_strategy == org_strategy);
 }
 
-int Station::utility() const
+int Station::utility()
 {
 	int u = t();
 	for (const auto &ptr : neighbours) {
@@ -75,21 +78,30 @@ int Station::utility() const
 	return u;
 }
 
-int Station::t() const
+int Station::t()
 {
 	return beta * gain() + impact();
 }
 
-int Station::impact() const
+int Station::impact()
 {
 	int i = 0;
 	for (const auto &ptr : neighbours) {
+#ifdef CACHE
+		if (common_cache.count(ptr.lock().get()))
+			i -= common_cache.at(ptr.lock().get());
+		else
+			i -= common(ptr.lock());
+#else
 		i -= common(ptr.lock());
+#endif // CACHE
+
+
 	}
 	return i;
 }
 
-int Station::gain() const
+int Station::gain()
 {
 	int g = 0;
 	for (const auto &nb : neighbours) {
@@ -99,18 +111,21 @@ int Station::gain() const
 }
 
 
-int Station::C(const shared_ptr<Station>& neighbour) const
+int Station::C(const shared_ptr<Station>& neighbour)
 {
 	return (common(neighbour) == 0) ? -static_cast<int>(neighbours.size()) : 0;
 }
 
-int Station::common(const shared_ptr<Station>& neighbour) const
+int Station::common(const shared_ptr<Station>& neighbour)
 {
 	int num = 0;
 	for (int i = 0; i < c_max; ++i) {
-		if (strategy.at(i) && neighbour->strategy.at(i))
+		if (strategy[i] && neighbour->strategy[i])
 			++num;
 	}
+#ifdef CACHE
+	common_cache[neighbour.get()] = num;
+#endif
 	return num;
 }
 

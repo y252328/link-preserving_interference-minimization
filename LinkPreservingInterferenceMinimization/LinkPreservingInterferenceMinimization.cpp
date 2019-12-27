@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 #include <random>
+#include <chrono>
 
 #include "Mesh.h"
 #include "Station.h"
@@ -97,7 +98,8 @@ int main()
 	constexpr double x_rang = 1000;
 	constexpr double y_rang = 1000;
 	std::random_device rd;
-	std::default_random_engine generator(rd());
+	//std::default_random_engine generator(rd());
+	std::default_random_engine generator(0);
 	std::uniform_real_distribution<double> x_unif(0.0, x_rang);
 	std::uniform_real_distribution<double> y_unif(0.0, y_rang);
 	auto mesh = Mesh();
@@ -106,8 +108,13 @@ int main()
 	}
 	mesh.auto_connect(range);
 	mesh.init_channel();
+	auto t1 = std::chrono::steady_clock::now();
 	mesh.find_nash();
+	auto t2 = std::chrono::steady_clock::now();
 	auto phi = mesh.potential();
+
+	cout << phi << endl;
+	cout << std::chrono::duration_cast<chrono::milliseconds>(t2-t1).count()/1000.0 << " s" << endl;
 	return 0;
 }
 

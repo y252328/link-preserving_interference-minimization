@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <memory>
-#include <unordered_set>
+#include <unordered_map>
 
 using namespace std;
 
@@ -19,18 +19,20 @@ public:
 	vector<int> get_channel();
 
 	bool best_response();
-	int utility() const;
-	int t() const;
-	int impact() const;
-	int gain() const;
-	int C(const shared_ptr<Station>& neighbour) const;
-	int common(const shared_ptr<Station>& neighbour) const;
+	int utility();
+	int t();
+	int impact();
+	int gain();
+	int C(const shared_ptr<Station>& neighbour);
+	int common(const shared_ptr<Station>& neighbour) ;
 	int sn;
 	double loc_x, loc_y;
 	~Station();
 private:
 	const int r_max, c_max, beta;
 	int interface_size;
+	int common_gain;
+	unordered_map<Station *, int> common_cache;
 	vector<weak_ptr<Station>> neighbours;
 	vector<bool> strategy;
 };
