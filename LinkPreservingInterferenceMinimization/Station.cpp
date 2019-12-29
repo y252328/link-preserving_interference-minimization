@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include <limits>
+#include <ctime>
 
 void Station::add_neighbour(const shared_ptr<Station>& neighbour)
 {
@@ -51,7 +52,8 @@ vector<int> Station::get_channel()
 bool Station::best_response()
 {
 	auto org_strategy = strategy;
-	vector<bool> max_strategy = org_strategy;
+	vector<vector<bool>> max_strategys(1, org_strategy);
+	int org_utility = utility();
 	int max_utility = utility();
 
 	vector<bool> walk(c_max, false);
@@ -61,15 +63,48 @@ bool Station::best_response()
 		strategy = walk;
 		t_strategy = chrono::steady_clock::now();
 		auto new_utility = utility();
-		if (new_utility > max_utility) {
-			max_strategy = walk;
+		if (new_utility == max_utility) {
+			max_strategys.push_back(walk);
+		} else if (new_utility > max_utility) {
+			max_strategys.clear();
+				max_strategys.push_back( walk);
 			max_utility = new_utility;
 		}
 	} while (prev_permutation(walk.begin(), walk.end()));
-	strategy = max_strategy;
+	if (!(org_utility == max_utility)) {
+		srand(time(NULL));
+		int RandIndex = rand() % max_strategys.size();
+		strategy = max_strategys[RandIndex];
+	}
+	else {
+		strategy = org_strategy;
+	}
 	t_strategy = chrono::steady_clock::now();
-	return !(max_strategy == org_strategy);
+	return !(org_utility == max_utility);
 }
+
+//bool Station::best_response()
+//{
+//	auto org_strategy = strategy;
+//	vector<bool> max_strategy = org_strategy;
+//	int max_utility = utility();
+//
+//	vector<bool> walk(c_max, false);
+//	fill(walk.begin(), walk.begin() + interface_size, true);
+//
+//	do {
+//		strategy = walk;
+//		t_strategy = chrono::steady_clock::now();
+//		auto new_utility = utility();
+//		if (new_utility > max_utility) {
+//			max_strategy = walk;
+//			max_utility = new_utility;
+//		}
+//	} while (prev_permutation(walk.begin(), walk.end()));
+//	strategy = max_strategy;
+//	t_strategy = chrono::steady_clock::now();
+//	return !(max_strategy == org_strategy);
+//}
 
 int Station::utility()
 {

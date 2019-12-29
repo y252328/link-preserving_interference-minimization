@@ -17,8 +17,9 @@ public:
 	void init_channel();
 
 	int potential() const; 
+	int interference() const;
 	double distance(const int idx_a, const int idx_b) const;
-	void find_nash();
+	void find_nash(bool print = false);
 	void print_status() const;
 	void auto_connect(const double range);
 	vector<shared_ptr<Station>> stations;
