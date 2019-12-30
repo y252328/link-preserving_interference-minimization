@@ -154,10 +154,12 @@
     <ClCompile Include="LinkPreservingInterferenceMinimization.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Station.cpp" />
+    <ClCompile Include="StationPP.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Station.h" />
+    <ClInclude Include="StationPP.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

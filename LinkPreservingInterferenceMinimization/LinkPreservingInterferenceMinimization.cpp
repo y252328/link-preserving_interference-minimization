@@ -11,10 +11,10 @@
 
 using namespace std;
 
-void my() {
+void my(const bool PP) {
 	auto mesh = Mesh();
 	for (int i = 0; i < 5; ++i)
-		mesh.create_station(3, 7, 5);
+		mesh.create_station(3, 7, 5, 0, 0, PP);
 
 	mesh.add_neighbour(1, 2);
 	mesh.add_neighbour(1, 3);
@@ -44,10 +44,10 @@ void my() {
 
 }
 
-void paper() {
+void paper(const bool PP) {
 	auto mesh = Mesh();
 	for (int i = 0; i < 5; ++i)
-		mesh.create_station(3, 7, 5);
+		mesh.create_station(3, 7, 5, 0, 0, PP);
 
 	mesh.add_neighbour(1, 2);
 	mesh.add_neighbour(1, 3);
@@ -71,6 +71,7 @@ void paper() {
 	mesh.add_neighbour(5, 3);
 	mesh.add_neighbour(5, 4);
 
+	mesh.init_channel();
 	mesh.stations[0]->assign_channel({ 2, 5, 7 });
 	mesh.stations[1]->assign_channel({ 1, 2, 3 });
 	mesh.stations[2]->assign_channel({ 1, 4, 5 });
@@ -91,36 +92,40 @@ void paper() {
 
 int main()
 {
-	my();
-	//paper();
+	my(true);
+	//paper(true);
 	return 0;
 	constexpr int r_max = 3;
-	//constexpr int c_max = 7;
+	constexpr int c_max = 7;
 	constexpr int beta = 25;
 	constexpr int node = 50;
 	constexpr double range = 200;
 	constexpr double x_rang = 1000;
 	constexpr double y_rang = 1000;
-	for (int c_max = 3; c_max <= 9; c_max += 1) {
-		std::random_device rd;
-		std::default_random_engine generator(rd());
-		//std::default_random_engine generator(0);
-		std::uniform_real_distribution<double> x_unif(0.0, x_rang);
-		std::uniform_real_distribution<double> y_unif(0.0, y_rang);
-		auto mesh = Mesh();
-		for (int i = 0; i < node; ++i) {
-			mesh.create_station(r_max, c_max, beta, x_unif(generator), y_unif(generator));
+	for (int x = 0; x < 3; ++x) {
+		for (int node = 50; node <= 100; node += 10) {
+			std::random_device rd;
+			std::default_random_engine generator(rd());
+			//std::default_random_engine generator(0);
+			std::uniform_real_distribution<double> x_unif(0.0, x_rang);
+			std::uniform_real_distribution<double> y_unif(0.0, y_rang);
+			auto mesh = Mesh();
+			for (int i = 0; i < node; ++i) {
+				mesh.create_station(r_max, 0, beta, x_unif(generator), y_unif(generator), true);
+			}
+			mesh.c_max(c_max);
+			mesh.auto_connect(range);
+			mesh.init_channel();
+			auto t1 = std::chrono::steady_clock::now();
+			mesh.find_nash();
+			auto t2 = std::chrono::steady_clock::now();
+			auto phi = mesh.potential();
+			cout << mesh.interference() << endl;
+			//cout << -phi << endl;
+			//cout << "I: " << mesh.interference() << endl;
+			//cout << std::chrono::duration_cast<chrono::milliseconds>(t2 - t1).count() / 1000.0 << " s" << endl;
 		}
-		mesh.auto_connect(range);
-		mesh.init_channel();
-		auto t1 = std::chrono::steady_clock::now();
-		mesh.find_nash();
-		auto t2 = std::chrono::steady_clock::now();
-		auto phi = mesh.potential();
-		cout << mesh.interference() << endl;
-		//cout << phi << endl;
-		//cout << "I: " << mesh.interference() << endl;
-		//cout << std::chrono::duration_cast<chrono::milliseconds>(t2 - t1).count() / 1000.0 << " s" << endl;
+		cout << endl;
 	}
 	return 0;
 }
