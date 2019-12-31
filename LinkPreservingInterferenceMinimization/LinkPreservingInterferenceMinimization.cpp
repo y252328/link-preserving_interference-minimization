@@ -92,9 +92,6 @@ void paper(const bool PP) {
 
 int main()
 {
-	my(true);
-	//paper(true);
-	return 0;
 	constexpr int r_max = 3;
 	constexpr int c_max = 7;
 	constexpr int beta = 25;
